@@ -25,7 +25,9 @@ export class TracksService {
   }
 
   create(createTrackDto: CreateTrackDto) {
-    return 'This action adds a new track';
+    const track = new Track(createTrackDto);
+    this.trackDB.set(track.id, track);
+    return track;
   }
 
   findAll() {

@@ -12,7 +12,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FindOneUserDto } from './dto/find-user.dto';
+import { ValidIdDto } from '../common-dto/valid-id.dto';
 
 @Controller('user')
 export class UserController {
@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param() { id }: FindOneUserDto) {
+  findOne(@Param() { id }: ValidIdDto) {
     return this.userService.findOne(id);
   }
 
@@ -39,10 +39,7 @@ export class UserController {
   }
 
   @Put(':id')
-  update(
-    @Param() { id }: FindOneUserDto,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  update(@Param() { id }: ValidIdDto, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
@@ -53,7 +50,7 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param() { id }: FindOneUserDto) {
+  remove(@Param() { id }: ValidIdDto) {
     return this.userService.remove(id);
   }
 }

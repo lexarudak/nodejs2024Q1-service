@@ -17,10 +17,6 @@ export class User {
     this.updatedAt = Date.now();
   }
 
-  get() {
-    return this;
-  }
-
   setPas(password: string) {
     this.password = password;
     this.version++;

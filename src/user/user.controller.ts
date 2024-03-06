@@ -10,7 +10,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FindOneUser } from './dto/find-user.dto';
+import { FindOneUserDto } from './dto/find-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +27,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param() { id }: FindOneUser) {
+  findOne(@Param() { id }: FindOneUserDto) {
     return this.userService.findOne(id);
   }
 

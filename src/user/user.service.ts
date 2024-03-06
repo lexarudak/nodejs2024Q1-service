@@ -3,16 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UUID } from 'src/utils/intefaces';
-import { v4 as uuid } from 'uuid';
 
-const testUser: User = {
-  id: uuid(),
+const testUser: User = new User({
   login: 'test',
   password: 'test',
-  version: 1,
-  createdAt: 11.2,
-  updatedAt: 22.22,
-};
+});
 
 @Injectable()
 export class UserService {
@@ -27,7 +22,9 @@ export class UserService {
   }
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const user = new User(createUserDto);
+    this.usersDB.set(user.id, user);
+    return this.removePas(user);
   }
 
   findAll() {

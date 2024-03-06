@@ -3,9 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -31,9 +31,9 @@ export class TracksController {
     return this.tracksService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    return this.tracksService.update(+id, updateTrackDto);
+  @Put(':id')
+  update(@Param() { id }: ValidIdDto, @Body() updateTrackDto: UpdateTrackDto) {
+    return this.tracksService.update(id, updateTrackDto);
   }
 
   @Delete(':id')

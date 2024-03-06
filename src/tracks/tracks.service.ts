@@ -38,8 +38,17 @@ export class TracksService {
     return this.getTrack(id);
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
-    return `This action updates a #${id} track`;
+  update(id: string, updateTrackDto: UpdateTrackDto) {
+    const { name, duration, albumId, artistId } = this.getTrack(id);
+    const newTrack = {
+      id,
+      name: updateTrackDto.name || name,
+      duration: updateTrackDto.duration || duration,
+      artistId: updateTrackDto.artistId || artistId,
+      albumId: updateTrackDto.albumId || albumId,
+    };
+    this.trackDB.set(newTrack.id, newTrack);
+    return newTrack;
   }
 
   remove(id: number) {

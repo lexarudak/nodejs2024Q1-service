@@ -66,7 +66,10 @@ export class UserService {
     return this.removePas(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    const user = this.usersDB.get(id);
+
+    this.checkIsUserExist(user);
+    this.usersDB.delete(user.id);
   }
 }

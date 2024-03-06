@@ -51,7 +51,9 @@ export class TracksService {
     return newTrack;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  remove(id: string) {
+    const track = this.getTrack(id);
+    this.trackDB.delete(track.id);
+    return;
   }
 }

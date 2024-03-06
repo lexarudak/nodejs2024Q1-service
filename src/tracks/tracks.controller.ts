@@ -6,6 +6,8 @@ import {
   Param,
   Delete,
   Put,
+  BadRequestException,
+  HttpCode,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -31,13 +33,24 @@ export class TracksController {
     return this.tracksService.findOne(id);
   }
 
+  @Put()
+  emptyUpdate() {
+    throw new BadRequestException('User id must be provided');
+  }
+
   @Put(':id')
   update(@Param() { id }: ValidIdDto, @Body() updateTrackDto: UpdateTrackDto) {
     return this.tracksService.update(id, updateTrackDto);
   }
 
+  @Delete()
+  emptyDelete() {
+    throw new BadRequestException('User id must be provided');
+  }
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tracksService.remove(+id);
+  @HttpCode(204)
+  remove(@Param() { id }: ValidIdDto) {
+    return this.tracksService.remove(id);
   }
 }

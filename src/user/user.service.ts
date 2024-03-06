@@ -6,14 +6,10 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { usersDB } from 'src/db/db';
 
 @Injectable()
 export class UserService {
-  usersDB: Map<string, User>;
-  constructor() {
-    this.usersDB = new Map<string, User>();
-  }
-
   removePas(user: User) {
     return { ...user, password: undefined };
   }
@@ -32,17 +28,17 @@ export class UserService {
 
   create(createUserDto: CreateUserDto) {
     const user = new User(createUserDto);
-    this.usersDB.set(user.id, user);
+    usersDB.set(user.id, user);
     return this.removePas(user);
   }
 
   findAll() {
-    const users = Array.from(this.usersDB.values()).map(this.removePas);
+    const users = Array.from(usersDB.values()).map(this.removePas);
     return users;
   }
 
   findOne(id: string) {
-    const user = this.usersDB.get(id);
+    const user = usersDB.get(id);
 
     this.checkIsUserExist(user);
 
@@ -50,7 +46,7 @@ export class UserService {
   }
 
   update(id: string, { oldPassword, newPassword }: UpdateUserDto) {
-    const user = this.usersDB.get(id);
+    const user = usersDB.get(id);
 
     this.checkIsUserExist(user);
     this.checkIsOldPasCorrect(user, oldPassword);
@@ -61,9 +57,9 @@ export class UserService {
   }
 
   remove(id: string) {
-    const user = this.usersDB.get(id);
+    const user = usersDB.get(id);
 
     this.checkIsUserExist(user);
-    this.usersDB.delete(user.id);
+    usersDB.delete(user.id);
   }
 }

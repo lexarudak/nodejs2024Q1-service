@@ -2,16 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
+import { trackDB } from 'src/db/db';
 
 @Injectable()
 export class TracksService {
-  trackDB: Map<string, Track>;
-  constructor() {
-    this.trackDB = new Map<string, Track>();
-  }
-
   getTrack(id: string) {
-    const track = this.trackDB.get(id);
+    const track = trackDB.get(id);
     if (!track?.id) {
       throw new NotFoundException(`Track with this id not found`);
     }
@@ -20,12 +16,12 @@ export class TracksService {
 
   create(createTrackDto: CreateTrackDto) {
     const track = new Track(createTrackDto);
-    this.trackDB.set(track.id, track);
+    trackDB.set(track.id, track);
     return track;
   }
 
   findAll() {
-    return Array.from(this.trackDB.values());
+    return Array.from(trackDB.values());
   }
 
   findOne(id: string) {
@@ -49,13 +45,13 @@ export class TracksService {
       artistId: artistId === undefined ? artistId : newArtistId,
       albumId: albumId === undefined ? albumId : newAlbumId,
     };
-    this.trackDB.set(newTrack.id, newTrack);
+    trackDB.set(newTrack.id, newTrack);
     return newTrack;
   }
 
   remove(id: string) {
     const track = this.getTrack(id);
-    this.trackDB.delete(track.id);
+    trackDB.delete(track.id);
     return;
   }
 }

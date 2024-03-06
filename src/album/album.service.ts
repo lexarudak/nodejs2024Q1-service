@@ -2,17 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
+import { albumDB, trackDB } from 'src/db/db';
 
 @Injectable()
 export class AlbumService {
-  albumDB: Map<string, Album>;
-
-  constructor() {
-    this.albumDB = new Map<string, Album>();
-  }
-
   getAlbum(id: string) {
-    const album = this.albumDB.get(id);
+    const album = albumDB.get(id);
     if (!album?.id) {
       throw new NotFoundException(`Album with this id not found`);
     }
@@ -21,12 +16,12 @@ export class AlbumService {
 
   create(createAlbumDto: CreateAlbumDto) {
     const album = new Album(createAlbumDto);
-    this.albumDB.set(album.id, album);
+    albumDB.set(album.id, album);
     return album;
   }
 
   findAll() {
-    return Array.from(this.albumDB.values());
+    return Array.from(albumDB.values());
   }
 
   findOne(id: string) {
@@ -44,13 +39,22 @@ export class AlbumService {
       year: newYear === undefined ? year : newYear,
       artistId: newArtistId === undefined ? artistId : newArtistId,
     };
-    this.albumDB.set(newAlbum.id, newAlbum);
+    albumDB.set(newAlbum.id, newAlbum);
     return newAlbum;
   }
 
   remove(id: string) {
     const album = this.getAlbum(id);
-    this.albumDB.delete(album.id);
+    const tracks = Array.from(trackDB.entries());
+    tracks.forEach(([key, track]) => {
+      if (track.albumId === id) {
+        trackDB.set(key, {
+          ...track,
+          albumId: null,
+        });
+      }
+    });
+    albumDB.delete(album.id);
     return;
   }
 }

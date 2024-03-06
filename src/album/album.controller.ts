@@ -50,7 +50,7 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param() id: string) {
+  remove(@Param() { id }: ValidIdDto) {
     return this.albumService.remove(id);
   }
 }

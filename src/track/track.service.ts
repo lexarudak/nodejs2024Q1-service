@@ -32,14 +32,22 @@ export class TracksService {
     return this.getTrack(id);
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
+  update(
+    id: string,
+    {
+      name: newName,
+      duration: newDuration,
+      artistId: newArtistId,
+      albumId: newAlbumId,
+    }: UpdateTrackDto,
+  ) {
     const { name, duration, albumId, artistId } = this.getTrack(id);
     const newTrack = {
       id,
-      name: updateTrackDto.name || name,
-      duration: updateTrackDto.duration || duration,
-      artistId: updateTrackDto.artistId || artistId,
-      albumId: updateTrackDto.albumId || albumId,
+      name: newName || name,
+      duration: newDuration || duration,
+      artistId: artistId === undefined ? artistId : newArtistId,
+      albumId: albumId === undefined ? albumId : newAlbumId,
     };
     this.trackDB.set(newTrack.id, newTrack);
     return newTrack;

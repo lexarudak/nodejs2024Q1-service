@@ -35,7 +35,7 @@ export class TracksController {
 
   @Put()
   emptyUpdate() {
-    throw new BadRequestException('User id must be provided');
+    throw new BadRequestException('Track id must be provided');
   }
 
   @Put(':id')
@@ -45,7 +45,7 @@ export class TracksController {
 
   @Delete()
   emptyDelete() {
-    throw new BadRequestException('User id must be provided');
+    throw new BadRequestException('Track id must be provided');
   }
 
   @Delete(':id')

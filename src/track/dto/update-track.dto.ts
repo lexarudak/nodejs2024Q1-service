@@ -1,6 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTrackDto } from './create-track.dto';
-import { IsInt, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 
 export class UpdateTrackDto extends PartialType(CreateTrackDto) {
   @IsString()
@@ -17,6 +24,7 @@ export class UpdateTrackDto extends PartialType(CreateTrackDto) {
 
   @IsNumber()
   @IsInt()
+  @Min(1)
   @IsOptional()
   duration: number; // integer number
 }

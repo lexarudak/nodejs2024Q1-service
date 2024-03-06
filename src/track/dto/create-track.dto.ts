@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Min,
 } from 'class-validator';
 
 export class CreateTrackDto {
@@ -22,5 +23,6 @@ export class CreateTrackDto {
 
   @IsNumber()
   @IsInt()
+  @Min(1)
   duration: number; // integer number
 }

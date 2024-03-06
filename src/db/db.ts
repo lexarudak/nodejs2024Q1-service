@@ -7,3 +7,7 @@ export const artistDB = new Map<string, Artist>();
 export const albumDB = new Map<string, Album>();
 export const trackDB = new Map<string, Track>();
 export const usersDB = new Map<string, User>();
+
+export const favArtistDB = new Map<string, Artist>();
+export const favAlbumDB = new Map<string, Album>();
+export const favTrackDB = new Map<string, Track>();

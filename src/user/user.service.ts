@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { UUID } from 'src/utils/intefaces';
 
 const testUser: User = new User({
   login: 'test',
@@ -11,14 +14,26 @@ const testUser: User = new User({
 
 @Injectable()
 export class UserService {
-  usersDB: Map<UUID, User>;
+  usersDB: Map<string, User>;
   constructor() {
-    this.usersDB = new Map<UUID, User>();
+    this.usersDB = new Map<string, User>();
     this.usersDB.set(testUser.id, testUser);
   }
 
   removePas(user: User) {
     return { ...user, password: undefined };
+  }
+
+  checkIsUserExist(user: User) {
+    if (!user?.id) {
+      throw new NotFoundException(`User with this id not found`);
+    }
+  }
+
+  checkIsOldPasCorrect(user: User, oldPas: string) {
+    if (user?.password !== oldPas) {
+      throw new ForbiddenException(`Old password is wrong`);
+    }
   }
 
   create(createUserDto: CreateUserDto) {
@@ -33,17 +48,22 @@ export class UserService {
   }
 
   findOne(id: string) {
-    const user = this.removePas(this.usersDB.get(id));
+    const user = this.usersDB.get(id);
 
-    if (!user.id) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+    this.checkIsUserExist(user);
 
-    return user;
+    return this.removePas(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, { oldPassword, newPassword }: UpdateUserDto) {
+    const user = this.usersDB.get(id);
+
+    this.checkIsUserExist(user);
+    this.checkIsOldPasCorrect(user, oldPassword);
+
+    user.setPas(newPassword);
+
+    return this.removePas(user);
   }
 
   remove(id: number) {

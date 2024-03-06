@@ -20,4 +20,10 @@ export class User {
   get() {
     return this;
   }
+
+  setPas(password: string) {
+    this.password = password;
+    this.version++;
+    this.updatedAt = Date.now();
+  }
 }

@@ -7,17 +7,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
-const testUser: User = new User({
-  login: 'test',
-  password: 'test',
-});
-
 @Injectable()
 export class UserService {
   usersDB: Map<string, User>;
   constructor() {
     this.usersDB = new Map<string, User>();
-    this.usersDB.set(testUser.id, testUser);
   }
 
   removePas(user: User) {

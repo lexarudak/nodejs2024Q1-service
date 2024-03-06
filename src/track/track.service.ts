@@ -3,17 +3,11 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 
-const testTrack = new Track({
-  name: 'testTrack',
-  duration: 320,
-});
-
 @Injectable()
 export class TracksService {
   trackDB: Map<string, Track>;
   constructor() {
     this.trackDB = new Map<string, Track>();
-    this.trackDB.set(testTrack.id, testTrack);
   }
 
   getTrack(id: string) {

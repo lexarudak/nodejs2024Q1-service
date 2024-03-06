@@ -9,12 +9,12 @@ import {
   BadRequestException,
   HttpCode,
 } from '@nestjs/common';
-import { TracksService } from './tracks.service';
+import { TracksService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ValidIdDto } from 'src/common-dto/valid-id.dto';
 
-@Controller('tracks')
+@Controller('track')
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 

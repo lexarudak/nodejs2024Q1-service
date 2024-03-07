@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { albumDB, trackDB } from 'src/db/db';
+import { albumDB, favAlbumDB, trackDB } from 'src/db/db';
 
 @Injectable()
 export class AlbumService {
@@ -44,7 +44,7 @@ export class AlbumService {
   }
 
   remove(id: string) {
-    const album = this.getAlbum(id);
+    this.getAlbum(id);
     const tracks = Array.from(trackDB.entries());
     tracks.forEach(([key, track]) => {
       if (track.albumId === id) {
@@ -54,7 +54,8 @@ export class AlbumService {
         });
       }
     });
-    albumDB.delete(album.id);
+    albumDB.delete(id);
+    favAlbumDB.delete(id);
     return;
   }
 }

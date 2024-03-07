@@ -20,6 +20,6 @@ export class User {
   setPas(password: string) {
     this.password = password;
     this.version++;
-    this.updatedAt = Date.now();
+    this.updatedAt = Date.now() + 1;
   }
 }

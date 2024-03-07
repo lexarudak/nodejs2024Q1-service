@@ -15,7 +15,7 @@ export class AlbumController {
 
   @Post()
   emptyAdd() {
-    throw new BadRequestException('Track id must be provided');
+    throw new BadRequestException('Album id must be provided');
   }
 
   @Post(':id')
@@ -25,7 +25,7 @@ export class AlbumController {
 
   @Delete()
   emptyRemove() {
-    throw new BadRequestException('Track id must be provided');
+    throw new BadRequestException('Album id must be provided');
   }
 
   @Delete(':id')

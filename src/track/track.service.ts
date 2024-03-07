@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
-import { trackDB } from 'src/db/db';
+import { favTrackDB, trackDB } from 'src/db/db';
 
 @Injectable()
 export class TracksService {
@@ -50,8 +50,9 @@ export class TracksService {
   }
 
   remove(id: string) {
-    const track = this.getTrack(id);
-    trackDB.delete(track.id);
+    this.getTrack(id);
+    trackDB.delete(id);
+    favTrackDB.delete(id);
     return;
   }
 }

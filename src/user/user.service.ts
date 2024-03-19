@@ -1,65 +1,80 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { usersDB } from 'src/db/db';
+import { PrismaService } from 'src/prisma.service';
+import {
+  errorHandler,
+  exclude,
+  isExist,
+  isOldPasCorrect,
+} from 'src/utils/helpers';
+import { Items } from 'src/utils/const';
 
 @Injectable()
 export class UserService {
-  removePas(user: User) {
-    return { ...user, password: undefined };
-  }
+  constructor(private prisma: PrismaService) {}
 
-  checkIsUserExist(user: User) {
-    if (!user?.id) {
-      throw new NotFoundException(`User with this id not found`);
-    }
-  }
-
-  checkIsOldPasCorrect(user: User, oldPas: string) {
-    if (user?.password !== oldPas) {
-      throw new ForbiddenException(`Old password is wrong`);
-    }
-  }
-
-  create(createUserDto: CreateUserDto) {
-    const user = new User(createUserDto);
-    usersDB.set(user.id, user);
-    return this.removePas(user);
+  async create({ login, password }: CreateUserDto) {
+    const user = await this.prisma.user.create({
+      data: {
+        login,
+        password,
+      },
+    });
+    return exclude(user);
   }
 
   findAll() {
-    const users = Array.from(usersDB.values()).map(this.removePas);
-    return users;
+    const users = this.prisma.user.findMany();
+    return exclude(users);
   }
 
-  findOne(id: string) {
-    const user = usersDB.get(id);
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-    this.checkIsUserExist(user);
+    isExist(user, Items.user);
 
-    return this.removePas(user);
+    return exclude(user);
   }
 
-  update(id: string, { oldPassword, newPassword }: UpdateUserDto) {
-    const user = usersDB.get(id);
+  async update(id: string, { oldPassword, newPassword }: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-    this.checkIsUserExist(user);
-    this.checkIsOldPasCorrect(user, oldPassword);
+    isExist(user, Items.user);
+    isOldPasCorrect(user, oldPassword);
 
-    user.setPas(newPassword);
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password: newPassword,
+        version: {
+          increment: 1,
+        },
+      },
+    });
 
-    return this.removePas(user);
+    return exclude(updatedUser);
   }
 
-  remove(id: string) {
-    const user = usersDB.get(id);
-
-    this.checkIsUserExist(user);
-    usersDB.delete(user.id);
+  async remove(id: string) {
+    try {
+      await this.prisma.user.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (e) {
+      errorHandler(e);
+    }
   }
 }

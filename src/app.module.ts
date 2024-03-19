@@ -4,7 +4,7 @@ import { TracksModule } from './track/track.module';
 import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { FavsModule } from './favs/favs.module';
-import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -13,15 +13,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
     ArtistModule,
     AlbumModule,
     FavsModule,
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'root',
-      database: 'rs-node',
-      models: [],
-      autoLoadModels: true,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
     }),
   ],
 })

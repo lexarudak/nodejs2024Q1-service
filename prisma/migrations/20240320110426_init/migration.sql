@@ -15,6 +15,7 @@ CREATE TABLE "Artist" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "grammy" BOOLEAN NOT NULL,
+    "favs" BOOLEAN,
 
     CONSTRAINT "Artist_pkey" PRIMARY KEY ("id")
 );
@@ -25,6 +26,7 @@ CREATE TABLE "Album" (
     "name" TEXT NOT NULL,
     "year" INTEGER NOT NULL,
     "artistId" TEXT,
+    "favs" BOOLEAN,
 
     CONSTRAINT "Album_pkey" PRIMARY KEY ("id")
 );
@@ -36,6 +38,7 @@ CREATE TABLE "Track" (
     "duration" INTEGER NOT NULL,
     "artistId" TEXT,
     "albumId" TEXT,
+    "favs" BOOLEAN,
 
     CONSTRAINT "Track_pkey" PRIMARY KEY ("id")
 );

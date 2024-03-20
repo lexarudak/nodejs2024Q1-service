@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ErrorCodes, Fields, Items } from './const';
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -7,8 +11,8 @@ type NewType = Fields;
 
 export function exclude<User, Key extends keyof User>(
   user: User,
-  keys: NewType[] = [Fields.pass],
 ): Omit<User, Key> {
+  const keys: NewType[] = [Fields.favs, Fields.pass];
   return Object.fromEntries(
     Object.entries(user).filter(([key]) => !keys.includes(key as Fields)),
   ) as Omit<User, Key>;
@@ -24,11 +28,14 @@ export const isOldPasCorrect = (user: User, oldPas: string) => {
   }
 };
 
-export const errorHandler = ({
-  code,
-  meta: { modelName, cause },
-}: PrismaClientKnownRequestError) => {
-  switch (code) {
+export const errorHandler = (
+  { code, meta: { modelName, cause } }: PrismaClientKnownRequestError,
+  manualCode?: ErrorCodes,
+) => {
+  switch (manualCode || code) {
+    case ErrorCodes.unprocessable:
+      throw new UnprocessableEntityException('Entity not found');
+
     case ErrorCodes.notFound:
       throw new NotFoundException(`${modelName}: ${cause}`);
 

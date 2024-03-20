@@ -9,10 +9,10 @@ import {
   BadRequestException,
   HttpCode,
 } from '@nestjs/common';
-import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { ValidIdDto } from 'src/common-dto/valid-id.dto';
+import { AlbumService } from './album.service';
 
 @Controller('album')
 export class AlbumController {

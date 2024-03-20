@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { PrismaService } from 'src/prisma.service';
-import { errorHandler, isExist } from 'src/utils/helpers';
-import { Items } from 'src/utils/const';
+import { errorHandler, exclude, isExist } from 'src/utils/helpers';
+import { ErrorCodes, Items } from 'src/utils/const';
 
 @Injectable()
 export class TracksService {
@@ -18,12 +18,21 @@ export class TracksService {
         albumId: albumId || null,
       },
     });
-    return track;
+    return exclude(track);
   }
 
   async findAll() {
     const tracks = await this.prisma.track.findMany();
-    return tracks;
+    return tracks.map(exclude);
+  }
+
+  async findFavs() {
+    const tracks = await this.prisma.track.findMany({
+      where: {
+        favs: true,
+      },
+    });
+    return tracks.map(exclude);
   }
 
   async findOne(id: string) {
@@ -35,7 +44,7 @@ export class TracksService {
 
     isExist(track, Items.track);
 
-    return track;
+    return exclude(track);
   }
 
   async update(
@@ -54,9 +63,25 @@ export class TracksService {
           artistId,
         },
       });
-      return updatedTrack;
+      return exclude(updatedTrack);
     } catch (e) {
       errorHandler(e);
+    }
+  }
+
+  async toggleFavTrack(id: string, favs: boolean) {
+    try {
+      const updatedTrack = await this.prisma.track.update({
+        where: {
+          id,
+        },
+        data: {
+          favs,
+        },
+      });
+      return exclude(updatedTrack);
+    } catch (e) {
+      errorHandler(e, ErrorCodes.unprocessable);
     }
   }
 

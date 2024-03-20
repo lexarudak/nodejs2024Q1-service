@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { PrismaService } from 'src/prisma.service';
-import { errorHandler, isExist } from 'src/utils/helpers';
-import { Items } from 'src/utils/const';
+import { errorHandler, exclude, isExist } from 'src/utils/helpers';
+import { ErrorCodes, Items } from 'src/utils/const';
 
 @Injectable()
 export class ArtistService {
@@ -16,12 +16,21 @@ export class ArtistService {
         grammy,
       },
     });
-    return artist;
+    return exclude(artist);
   }
 
   async findAll() {
     const artists = await this.prisma.artist.findMany();
-    return artists;
+    return artists.map(exclude);
+  }
+
+  async findFavs() {
+    const artists = await this.prisma.artist.findMany({
+      where: {
+        favs: true,
+      },
+    });
+    return artists.map(exclude);
   }
 
   async findOne(id: string) {
@@ -33,7 +42,7 @@ export class ArtistService {
 
     isExist(artist, Items.artist);
 
-    return artist;
+    return exclude(artist);
   }
 
   async update(id: string, { name, grammy }: UpdateArtistDto) {
@@ -47,9 +56,25 @@ export class ArtistService {
           grammy,
         },
       });
-      return updatedArtist;
+      return exclude(updatedArtist);
     } catch (e) {
       errorHandler(e);
+    }
+  }
+
+  async toggleFavArtist(id: string, favs: boolean) {
+    try {
+      const artist = await this.prisma.artist.update({
+        where: {
+          id,
+        },
+        data: {
+          favs,
+        },
+      });
+      return exclude(artist);
+    } catch (e) {
+      errorHandler(e, ErrorCodes.unprocessable);
     }
   }
 

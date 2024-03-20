@@ -1,58 +1,74 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from './entities/track.entity';
-import { favTrackDB, trackDB } from 'src/db/db';
+import { PrismaService } from 'src/prisma.service';
+import { errorHandler, isExist } from 'src/utils/helpers';
+import { Items } from 'src/utils/const';
 
 @Injectable()
 export class TracksService {
-  getTrack(id: string) {
-    const track = trackDB.get(id);
-    if (!track?.id) {
-      throw new NotFoundException(`Track with this id not found`);
-    }
+  constructor(private prisma: PrismaService) {}
+
+  async create({ name, duration, artistId, albumId }: CreateTrackDto) {
+    const track = await this.prisma.track.create({
+      data: {
+        name,
+        duration,
+        artistId: artistId || null,
+        albumId: albumId || null,
+      },
+    });
     return track;
   }
 
-  create(createTrackDto: CreateTrackDto) {
-    const track = new Track(createTrackDto);
-    trackDB.set(track.id, track);
+  async findAll() {
+    const tracks = await this.prisma.track.findMany();
+    return tracks;
+  }
+
+  async findOne(id: string) {
+    const track = await this.prisma.track.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    isExist(track, Items.track);
+
     return track;
   }
 
-  findAll() {
-    return Array.from(trackDB.values());
-  }
-
-  findOne(id: string) {
-    return this.getTrack(id);
-  }
-
-  update(
+  async update(
     id: string,
-    {
-      name: newName,
-      duration: newDuration,
-      artistId: newArtistId,
-      albumId: newAlbumId,
-    }: UpdateTrackDto,
+    { name, duration, artistId, albumId }: UpdateTrackDto,
   ) {
-    const { name, duration, albumId, artistId } = this.getTrack(id);
-    const newTrack = {
-      id,
-      name: newName || name,
-      duration: newDuration || duration,
-      artistId: artistId === undefined ? artistId : newArtistId,
-      albumId: albumId === undefined ? albumId : newAlbumId,
-    };
-    trackDB.set(newTrack.id, newTrack);
-    return newTrack;
+    try {
+      const updatedTrack = await this.prisma.track.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          duration,
+          albumId,
+          artistId,
+        },
+      });
+      return updatedTrack;
+    } catch (e) {
+      errorHandler(e);
+    }
   }
 
-  remove(id: string) {
-    this.getTrack(id);
-    trackDB.delete(id);
-    favTrackDB.delete(id);
-    return;
+  async remove(id: string) {
+    try {
+      await this.prisma.track.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (e) {
+      errorHandler(e);
+    }
   }
 }

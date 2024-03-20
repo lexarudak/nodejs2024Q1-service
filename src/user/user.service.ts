@@ -24,9 +24,9 @@ export class UserService {
     return exclude(user);
   }
 
-  findAll() {
-    const users = this.prisma.user.findMany();
-    return exclude(users);
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+    return users.map((user) => exclude(user));
   }
 
   async findOne(id: string) {

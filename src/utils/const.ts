@@ -4,6 +4,9 @@ export const enum Fields {
 
 export const enum Items {
   user = 'User',
+  track = 'Track',
+  artist = 'Artist',
+  album = 'Album',
 }
 
 export const enum ErrorCodes {

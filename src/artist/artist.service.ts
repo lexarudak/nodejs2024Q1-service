@@ -1,69 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
-import { albumDB, artistDB, favArtistDB, trackDB } from 'src/db/db';
+import { PrismaService } from 'src/prisma.service';
+import { errorHandler, isExist } from 'src/utils/helpers';
+import { Items } from 'src/utils/const';
 
 @Injectable()
 export class ArtistService {
-  getArtist(id: string) {
-    const track = artistDB.get(id);
-    if (!track?.id) {
-      throw new NotFoundException(`Artist with this id not found`);
-    }
-    return track;
-  }
+  constructor(private prisma: PrismaService) {}
 
-  create(createArtistDto: CreateArtistDto) {
-    const artist = new Artist(createArtistDto);
-    artistDB.set(artist.id, artist);
+  async create({ name, grammy }: CreateArtistDto) {
+    const artist = await this.prisma.artist.create({
+      data: {
+        name,
+        grammy,
+      },
+    });
     return artist;
   }
 
-  findAll() {
-    return Array.from(artistDB.values());
+  async findAll() {
+    const artists = await this.prisma.artist.findMany();
+    return artists;
   }
 
-  findOne(id: string) {
-    return this.getArtist(id);
-  }
-
-  update(id: string, { name: newName, grammy: newGrammy }: UpdateArtistDto) {
-    const { name, grammy } = this.getArtist(id);
-    const newArtist = {
-      id,
-      name: newName || name,
-      grammy: newGrammy !== undefined ? newGrammy : grammy,
-    };
-    artistDB.set(newArtist.id, newArtist);
-    return newArtist;
-  }
-
-  remove(id: string) {
-    this.getArtist(id);
-
-    const tracks = Array.from(trackDB.entries());
-    tracks.forEach(([key, track]) => {
-      if (track.artistId === id) {
-        trackDB.set(key, {
-          ...track,
-          artistId: null,
-        });
-      }
+  async findOne(id: string) {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id,
+      },
     });
 
-    const albums = Array.from(albumDB.entries());
-    albums.forEach(([key, artist]) => {
-      if (artist.artistId === id) {
-        albumDB.set(key, {
-          ...artist,
-          artistId: null,
-        });
-      }
-    });
+    isExist(artist, Items.artist);
 
-    artistDB.delete(id);
-    favArtistDB.delete(id);
-    return;
+    return artist;
+  }
+
+  async update(id: string, { name, grammy }: UpdateArtistDto) {
+    try {
+      const updatedArtist = await this.prisma.artist.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          grammy,
+        },
+      });
+      return updatedArtist;
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.prisma.artist.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (e) {
+      errorHandler(e);
+    }
   }
 }

@@ -9,6 +9,11 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 type NewType = Fields;
 
+interface UserStringDate {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export function exclude<User, Key extends keyof User>(
   user: User,
 ): Omit<User, Key> {
@@ -42,4 +47,12 @@ export const errorHandler = (
     default:
       break;
   }
+};
+
+export const changeDataFormat = (user: UserStringDate) => {
+  return {
+    ...user,
+    createdAt: new Date(user.createdAt).getTime(),
+    updatedAt: new Date(user.updatedAt).getTime(),
+  };
 };

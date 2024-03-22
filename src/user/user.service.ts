@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import {
+  changeDataFormat,
   errorHandler,
   exclude,
   isExist,
@@ -21,12 +22,13 @@ export class UserService {
         password,
       },
     });
-    return exclude(user);
+
+    return exclude(changeDataFormat(user));
   }
 
   async findAll() {
     const users = await this.prisma.user.findMany();
-    return users.map((user) => exclude(user));
+    return users.map((user) => exclude(changeDataFormat(user)));
   }
 
   async findOne(id: string) {
@@ -38,7 +40,7 @@ export class UserService {
 
     isExist(user, Items.user);
 
-    return exclude(user);
+    return exclude(changeDataFormat(user));
   }
 
   async update(id: string, { oldPassword, newPassword }: UpdateUserDto) {
@@ -63,7 +65,7 @@ export class UserService {
       },
     });
 
-    return exclude(updatedUser);
+    return exclude(changeDataFormat(updatedUser));
   }
 
   async remove(id: string) {

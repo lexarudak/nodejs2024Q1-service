@@ -36,3 +36,4 @@ lerna-debug.log*
 
 request-logs.txt
 response-logs.txt
+error-logs.txt

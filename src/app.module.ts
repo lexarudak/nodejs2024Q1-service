@@ -7,7 +7,6 @@ import { FavsModule } from './favs/favs.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggingService } from './logging/logging.service';
 import { LoggingMiddleware } from './logging.middleware';
-import { AppController } from './app.controller';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging.interceptor';
 
@@ -29,7 +28,6 @@ import { LoggingInterceptor } from './logging.interceptor';
       useClass: LoggingInterceptor,
     },
   ],
-  controllers: [AppController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

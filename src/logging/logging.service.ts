@@ -5,6 +5,7 @@ import { appendFile } from 'fs/promises';
 export class LoggingService {
   requestLogsPath = './request-logs.txt';
   responseLogsPath = './response-logs.txt';
+  errorsLogsPath = './errors-logs.txt';
   logErrorMessage = 'LOGS ERROR';
   logMessageEnd = '\n-----------------\n';
 
@@ -29,5 +30,9 @@ export class LoggingService {
 
   async logReq(obj: object) {
     await this._writeLog(obj, this.requestLogsPath);
+  }
+
+  async logErr(obj: object) {
+    await this._writeLog(obj, this.errorsLogsPath);
   }
 }

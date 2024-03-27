@@ -5,9 +5,10 @@ import { SwaggerModule } from '@nestjs/swagger';
 import * as YAML from 'yamljs';
 import { ExceptionsFilter } from './exceptions.filter';
 import { LoggingService } from './logging/logging.service';
+import { ConfigService } from '@nestjs/config';
 
 const port = process.env.PORT || 4000;
-const logger = new LoggingService();
+const logger = new LoggingService(new ConfigService());
 
 async function bootstrap() {
   process.on('uncaughtException', async (err) => {

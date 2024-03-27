@@ -7,10 +7,21 @@ import { ExceptionsFilter } from './exceptions.filter';
 import { LoggingService } from './logging/logging.service';
 
 const port = process.env.PORT || 4000;
+const logger = new LoggingService();
 
 async function bootstrap() {
+  process.on('uncaughtException', async (err) => {
+    await logger.logUncaughtException(err);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.logUnhandledRejection(reason, promise);
+    process.exit(1);
+  });
+
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new ExceptionsFilter(new LoggingService()));
+  app.useGlobalFilters(new ExceptionsFilter(logger));
   app.useGlobalPipes(new ValidationPipe());
 
   const yamlDocument = YAML.load('./doc/api.yaml');

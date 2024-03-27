@@ -35,4 +35,25 @@ export class LoggingService {
   async logErr(obj: object) {
     await this._writeLog(obj, this.errorsLogsPath);
   }
+
+  async logUncaughtException(error: object) {
+    await this._writeLog(
+      {
+        type: 'Uncaught Exception',
+        error,
+      },
+      this.errorsLogsPath,
+    );
+  }
+
+  async logUnhandledRejection(reason: unknown, promise: Promise<unknown>) {
+    await this._writeLog(
+      {
+        type: 'Unhandled Rejection',
+        reason,
+        promise,
+      },
+      this.errorsLogsPath,
+    );
+  }
 }

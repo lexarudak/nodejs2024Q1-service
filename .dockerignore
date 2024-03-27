@@ -3,3 +3,5 @@ node_modules
 Dockerfile
 dist
 test
+request-logs.txt
+response-logs.txt

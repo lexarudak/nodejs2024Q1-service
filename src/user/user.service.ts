@@ -6,6 +6,7 @@ import {
   changeDataFormat,
   errorHandler,
   exclude,
+  hashPassword,
   isExist,
   isOldPasCorrect,
 } from 'src/utils/helpers';
@@ -16,10 +17,11 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create({ login, password }: CreateUserDto) {
+    const hashedPas = await hashPassword(password);
     const user = await this.prisma.user.create({
       data: {
         login,
-        password,
+        password: hashedPas,
       },
     });
 
@@ -51,14 +53,15 @@ export class UserService {
     });
 
     isExist(user, Items.user);
-    isOldPasCorrect(user, oldPassword);
+    await isOldPasCorrect(oldPassword, user.password);
 
+    const hashedNewPas = await hashPassword(newPassword);
     const updatedUser = await this.prisma.user.update({
       where: {
         id,
       },
       data: {
-        password: newPassword,
+        password: hashedNewPas,
         version: {
           increment: 1,
         },

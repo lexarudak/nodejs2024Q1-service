@@ -4,8 +4,8 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ErrorCodes, Fields, Items } from './const';
-import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { compare, hash } from 'bcrypt';
 
 type NewType = Fields;
 
@@ -27,8 +27,9 @@ export const isExist = (item: any, Items: Items) => {
   if (!item) throw new NotFoundException(`${Items} not found`);
 };
 
-export const isOldPasCorrect = (user: User, oldPas: string) => {
-  if (user.password !== oldPas) {
+export const isOldPasCorrect = async (password: string, hashPas: string) => {
+  const isCorrect = await compare(password, hashPas);
+  if (!isCorrect) {
     throw new ForbiddenException(`Old password is wrong`);
   }
 };
@@ -55,4 +56,9 @@ export const changeDataFormat = (user: UserStringDate) => {
     createdAt: new Date(user.createdAt).getTime(),
     updatedAt: new Date(user.updatedAt).getTime(),
   };
+};
+
+export const hashPassword = async (password: string, saltRounds = 10) => {
+  const hashedPassword = await hash(password, saltRounds);
+  return hashedPassword;
 };

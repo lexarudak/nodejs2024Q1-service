@@ -9,6 +9,7 @@ import { LoggingService } from './logging/logging.service';
 import { LoggingMiddleware } from './logging.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging.interceptor';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { LoggingInterceptor } from './logging.interceptor';
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
+    AuthModule,
   ],
   providers: [
     LoggingService,

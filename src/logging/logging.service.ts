@@ -3,20 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { createReadStream, createWriteStream } from 'fs';
 import { appendFile, mkdir, stat, unlink } from 'fs/promises';
 import { join } from 'path';
+import { ENV, TITLES } from 'src/utils/const';
 import { pipeline } from 'stream/promises';
-
-enum TITLES {
-  response = 'RESPONSE',
-  request = 'REQUEST',
-  error = 'ERROR',
-  uncaught = 'UNCAUGHT EXCEPTION',
-  unhandled = 'UNHANDLED REJECTION',
-}
-
-enum ENV {
-  log = 'LOG_SIZE',
-  err = 'LOG_ERRORS_SIZE',
-}
 
 @Injectable()
 export class LoggingService {

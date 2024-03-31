@@ -8,7 +8,7 @@ import {
   exclude,
   hashPassword,
   isExist,
-  isOldPasCorrect,
+  isPassCorrect,
 } from 'src/utils/helpers';
 import { Items } from 'src/utils/const';
 
@@ -18,6 +18,19 @@ export class UserService {
 
   async create({ login, password }: CreateUserDto) {
     const hashedPas = await hashPassword(password);
+    const oldUser = await this.prisma.user.findUnique({
+      where: {
+        login,
+      },
+    });
+    if (oldUser) {
+      await this.prisma.user.delete({
+        where: {
+          login,
+        },
+      });
+    }
+
     const user = await this.prisma.user.create({
       data: {
         login,
@@ -53,7 +66,7 @@ export class UserService {
     });
 
     isExist(user, Items.user);
-    await isOldPasCorrect(oldPassword, user.password);
+    await isPassCorrect(oldPassword, user.password);
 
     const hashedNewPas = await hashPassword(newPassword);
     const updatedUser = await this.prisma.user.update({

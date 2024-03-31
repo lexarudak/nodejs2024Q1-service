@@ -7,12 +7,11 @@ import {
 import { Request, Response } from 'express';
 import { LoggingService } from './logging/logging.service';
 
+const DEFAULT_STATUS = 500;
+const DEFAULT_MESSAGE = 'Internal server error';
 @Catch()
 export class ExceptionsFilter<T> implements ExceptionFilter {
   constructor(private readonly loggingService: LoggingService) {}
-
-  DEFAULT_STATUS: 500;
-  DEFAULT_MESSAGE: 'Internal server error';
 
   getExceptionMessage(exception: HttpException) {
     const res = exception.getResponse();
@@ -26,11 +25,11 @@ export class ExceptionsFilter<T> implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
-        : this.DEFAULT_STATUS;
+        : DEFAULT_STATUS;
     const message =
       exception instanceof HttpException
         ? this.getExceptionMessage(exception)
-        : this.DEFAULT_MESSAGE;
+        : DEFAULT_MESSAGE;
 
     const body = {
       status,

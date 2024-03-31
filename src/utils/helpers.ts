@@ -6,8 +6,15 @@ import {
 import { ErrorCodes, Fields, Items } from './const';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { compare, hash } from 'bcrypt';
+import { JwtPayload, sign } from 'jsonwebtoken';
 
 type NewType = Fields;
+export type TokenData = {
+  JWT_SECRET_KEY: string;
+  JWT_SECRET_REFRESH_KEY: string;
+  TOKEN_EXPIRE_TIME: string;
+  TOKEN_REFRESH_EXPIRE_TIME: string;
+};
 
 interface UserStringDate {
   createdAt: Date;
@@ -23,14 +30,15 @@ export function exclude<User, Key extends keyof User>(
   ) as Omit<User, Key>;
 }
 
-export const isExist = (item: any, Items: Items) => {
+export const isExist = (item: any, Items: Items, forbidden?: boolean) => {
+  if (!item && forbidden) throw new ForbiddenException(`${Items} not found`);
   if (!item) throw new NotFoundException(`${Items} not found`);
 };
 
-export const isOldPasCorrect = async (password: string, hashPas: string) => {
+export const isPassCorrect = async (password: string, hashPas: string) => {
   const isCorrect = await compare(password, hashPas);
   if (!isCorrect) {
-    throw new ForbiddenException(`Old password is wrong`);
+    throw new ForbiddenException(`Password is wrong`);
   }
 };
 
@@ -61,4 +69,23 @@ export const changeDataFormat = (user: UserStringDate) => {
 export const hashPassword = async (password: string, saltRounds = 10) => {
   const hashedPassword = await hash(password, saltRounds);
   return hashedPassword;
+};
+
+export const getTokens = (
+  payload: string | JwtPayload,
+  {
+    JWT_SECRET_KEY,
+    JWT_SECRET_REFRESH_KEY,
+    TOKEN_EXPIRE_TIME,
+    TOKEN_REFRESH_EXPIRE_TIME,
+  }: TokenData,
+) => {
+  const accessToken = sign(payload, JWT_SECRET_KEY, {
+    expiresIn: TOKEN_EXPIRE_TIME,
+  });
+  const refreshToken = sign(payload, JWT_SECRET_REFRESH_KEY, {
+    expiresIn: TOKEN_REFRESH_EXPIRE_TIME,
+  });
+
+  return { accessToken, refreshToken };
 };

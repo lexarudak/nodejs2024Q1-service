@@ -10,6 +10,7 @@ import { LoggingMiddleware } from './logging.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { AuthMiddleware } from './auth.middleware';
 
 @Module({
   imports: [
@@ -33,6 +34,11 @@ import { AuthModule } from './auth/auth.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude('auth/signup', 'auth/login', '/doc', '/')
+      .forRoutes('*');
+
     consumer.apply(LoggingMiddleware).forRoutes('*');
   }
 }

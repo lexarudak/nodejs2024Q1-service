@@ -15,7 +15,7 @@ git clone https://github.com/lexarudak/nodejs2024Q1-service.git
 ## Pull branch changes
 
 ```
-git pull origin part-2
+git pull origin part-3
 ```
 
 ## Installing NPM modules
